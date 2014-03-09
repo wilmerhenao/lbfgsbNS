@@ -1,0 +1,28 @@
+ final results rosenbrock (new) run:           9        2000   2.0000000000000000               13          20   9216065.5323544424        4.3930443736156085E-003   1.7051526342015677E-004   1.9082000711932778E-002 CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       1000                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       1000                                                                
+ mnp =            9        2000   2.0000000000000000     
+ Value of f = (NEW CODE)   9216065.5323544424     
+ Iterate           13
+  Positive dir derivative in projection 
+  Using the backtracking step 
+  Positive dir derivative in projection 
+  Using the backtracking step 
+ final results rosenbrock (new) run:           9        2000   1.1000000000000001               35          95   152913.07563110485        3.7312457513563125E-006   4.5458125302474954        8.7113996734842658E-002 CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ mnp =            9        2000   1.1000000000000001     
+ Value of f = (NEW CODE)   152913.07563110485     
+ Iterate           35
+  Positive dir derivative in projection 
+  Using the backtracking step 
+ final results rosenbrock (new) run:           9        2000   1.0100000000000000               41         132   101348.63544971337        2.0458236942978640E-003   4.7321454982537077       0.13175500300712883      CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ mnp =            9        2000   1.0100000000000000     
+ Value of f = (NEW CODE)   101348.63544971337     
+ Iterate           41
+  Positive dir derivative in projection 
+  Using the backtracking step 
+ final results rosenbrock (new) run:           9        2000   1.0009999999999999              515        1077   97265.564521353837        1.5095237160829859E-003   5.2746705032565169        1.2018009930616245      CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ mnp =            9        2000   1.0009999999999999     
+ Value of f = (NEW CODE)   97265.564521353837     
+ Iterate          515

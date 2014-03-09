@@ -1,0 +1,5 @@
+ final results rosenbrock (new) run:          10       10000   1.0100000000000000             1000     1040603   506925.94767783256        6.9532939499663521E-310   5.9924592697105208        4313.3690285936464      STOP: TOTAL NUMBER OF ITERATIONS REACHED 100000                                                                         
+ STOP: TOTAL NUMBER OF ITERATIONS REACHED 100000                                                                         
+ mnp =           10       10000   1.0100000000000000     
+ Value of f = (NEW CODE)   506925.94767783256     
+ Iterate         1000

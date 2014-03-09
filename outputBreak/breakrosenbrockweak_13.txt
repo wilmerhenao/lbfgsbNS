@@ -1,0 +1,24 @@
+ final results rosenbrock (new) run:          13        2000   2.0000000000000000               13          20   9216065.5323543176        4.3977263468804994E-003   1.8119766886570687E-004   1.7764000687748194E-002 CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       1000                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       1000                                                                
+ mnp =           13        2000   2.0000000000000000     
+ Value of f = (NEW CODE)   9216065.5323543176     
+ Iterate           13
+ final results rosenbrock (new) run:          13        2000   1.1000000000000001               29          68   152913.11534598545        1.0348157397121465E-003   4.6497373826574844        6.8760997150093317E-002 CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ mnp =           13        2000   1.1000000000000001     
+ Value of f = (NEW CODE)   152913.11534598545     
+ Iterate           29
+  Positive dir derivative in projection 
+  Using the backtracking step 
+ final results rosenbrock (new) run:          13        2000   1.0100000000000000               34         109   101348.76398165012        4.8902593668464589E-004   4.8159487078777596       0.11015600035898387      CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ mnp =           13        2000   1.0100000000000000     
+ Value of f = (NEW CODE)   101348.76398165012     
+ Iterate           34
+  Positive dir derivative in projection 
+  Using the backtracking step 
+ final results rosenbrock (new) run:          13        2000   1.0009999999999999              622        1291   97265.558237842823        1.0880636756040872E-003   5.2745188239123690        1.7007399728754535      CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ mnp =           13        2000   1.0009999999999999     
+ Value of f = (NEW CODE)   97265.558237842823     
+ Iterate          622

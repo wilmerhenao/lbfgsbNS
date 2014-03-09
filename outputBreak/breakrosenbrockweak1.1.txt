@@ -1,0 +1,5 @@
+ final results rosenbrock (new) run:          10       10000   1.1000000000000001               24          62   764853.32029359729        1.7232960941347925E-006  0.90610495457515650       0.27486298885196447      CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       4999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       4999                                                                
+ mnp =           10       10000   1.1000000000000001     
+ Value of f = (NEW CODE)   764853.32029359729     
+ Iterate           24

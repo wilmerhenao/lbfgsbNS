@@ -1,0 +1,20 @@
+ final results rosenbrock (new) run:           5        2000   2.0000000000000000               13          20   9216065.5323542561        3.9783610666674213E-003   2.5839310877628918E-004   1.2115000165067613E-002 CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       1000                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =       1000                                                                
+ mnp =            5        2000   2.0000000000000000     
+ Value of f = (NEW CODE)   9216065.5323542561     
+ Iterate           13
+ final results rosenbrock (new) run:           5        2000   1.1000000000000001               25          64   152913.13130102912        1.8288311362228430E-004   4.4584743276416079        5.6344998534768820E-002 CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ CONVERGENCE: ZERO_GRAD_IN_CONV_ HULL, nfree =        999                                                                
+ mnp =            5        2000   1.1000000000000001     
+ Value of f = (NEW CODE)   152913.13130102912     
+ Iterate           25
+ final results rosenbrock (new) run:           5        2000   1.0100000000000000               25          92   101450.08813178459        6.9532331106752929E-310   3.7590901353152728        8.0815001158043742E-002 CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH                                                                         
+ CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH                                                                         
+ mnp =            5        2000   1.0100000000000000     
+ Value of f = (NEW CODE)   101450.08813178459     
+ Iterate           25
+ final results rosenbrock (new) run:           5        2000   1.0009999999999999               23          80   97362.697921398052        6.9531827943848683E-310   7.1479705245354852        7.1539000025950372E-002 CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH                                                                         
+ CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH                                                                         
+ mnp =            5        2000   1.0009999999999999     
+ Value of f = (NEW CODE)   97362.697921398052     
+ Iterate           23

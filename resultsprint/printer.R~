@@ -1,0 +1,2 @@
+a <- read.csv("typicalDescent.csv")
+plot(tail(a[, c(1,3)], 27), title = "Convergence for ")
