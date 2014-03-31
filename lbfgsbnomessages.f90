@@ -3671,10 +3671,7 @@
         task = 'WARNING: STP = STPMAX'
       if (stp .eq. stpmin .and. (f .gt. ftest .or. g .ge. gtest)) &
         task = 'WARNING: STP = STPMIN'
-!     Michael Overton:
-!     Test for convergence.
-!     Change abs(g) to -g 
-!     Note that -ginit is always positive
+
 !     if (f .le. ftest .and. abs(g) .le. gtol*(-ginit)) 
       if (f .le. ftest .and. -g .le. gtol*(-ginit)) &
         task = 'CONVERGENCE'
@@ -4263,10 +4260,11 @@
            task = 'WARNING: ROUNDING ERRORS PREVENT PROGRESS'
       if (brackt .and. stmax - stmin .le. xtol*stmax) &
            task = 'WARNING: XTOL TEST SATISFIED'
-      if (stp .eq. stpmax .and. f .le. ftest .and. g .le. gtest) &
-           task = 'WARNING: STP = STPMAX'
-      if (stp .eq. stpmin .and. (f .gt. ftest .or. g .ge. gtest)) &
-           task = 'WARNING: STP = STPMIN'
+      if (stp .gt. 2**20) & 
+           task = 'WARNING: STP = TOO LONG'
+
+!      if (stp .eq. stpmin .and. (f .gt. ftest .or. g .ge. gtest)) &
+!           task = 'WARNING: STP = STPMIN'
 !     Michael Overton:
 !     Test for convergence.
 !     Change abs(g) to -g 
@@ -4287,24 +4285,6 @@
          call linesearchstep(stx,fx,gx,sty,fy,gy,stp,f,g, &
               brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol)
       endif
-      
-!     Set the minimum and maximum steps allowed for stp.
-
-      if (brackt) then
-         stmin = min(stx,sty)
-         stmax = max(stx,sty)
-      else
-         stmin = stp + xtrapl*(stp - stx)
-         stmax = stp + xtrapu*(stp - stx)
-      endif
- 
-!     Force the step to be within the bounds stpmax and stpmin.
- 
-      stp = max(stp,stpmin)
-      stp = min(stp,stpmax)
-
-!     If further progress is not possible, let stp be the best
-!     point obtained during the search.
 
 !     Obtain another function and derivative.
 
@@ -4340,9 +4320,9 @@
 
       subroutine linesearchstep(stx,fx,dx,sty,fy,dy,stp,fp,dp,brackt, &
            stpmin,stpmax,finit,ginit,ftest,ftol,gtol)
-      logical brackt
       double precision stx,fx,dx,sty,fy,dy,stp,fp,dp,stpmin,stpmax,finit
       double precision ginit,ftest,ftol,gtol
+      logical brackt
 
 !     **********
 !
@@ -4436,37 +4416,42 @@
 !     Brett M. Averick and Jorge J. More'.
 !
 !     **********
-      double precision zero,p66,two,three
-      parameter(zero=0.0d0,p66=0.66d0,two=2.0d0,three=3.0d0)
+      double precision zero,two,three
+      parameter(zero=0.0d0,two=2.0d0,three=3.0d0)
       
       double precision gamma,p,q,r,s,stpc,stpf
-!      write(*,*) 'dp:'
-!      write(*,*) dp
 !     Check first condition if first condition is violated.  Gone too far
+!     Test Armijo
       if (fp .ge. ftest) then 
          sty = stp
          fy = fp
          dy = dp
+         brackt = .true.
       else
-!     if second condition is violated not gone far enough
+!     if second condition is violated not gone far enough (Wolfe)
          if (-dp .ge. gtol*(-ginit)) then
             stx = stp
             fx = fp
             dx = dp
          else
-            print *, 'You shouldnt ever have to enter here'
-!            task = 'ERROR:  USER SHOULDNT ENTER IN THIS ELSE STATEMENT'
-!     Question:  Why expand?
-         endif         
+            return
+         endif
       endif   
-      stpf = (sty + stx)/two
-      if ((min(stx,sty) .le. stp) .and. stp .le. max(stx,sty)) then
-         brackt = .true.
+      
+      !Bisection and expansion
+      if (brackt) then
+         stp = (sty + stx)/two
+      else
+         if (two * stp .le. stpmax) then !Remain within boundaries
+            ! Still in expansion mode
+            stp = two * stp
+         else
+            brackt = .true.
+            sty = stp
+            fy = fp
+            dy = dp
+         endif
       endif
-      
-!     Compute the new step.
-      
-      stp = stpf
       return
       end
       
