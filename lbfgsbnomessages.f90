@@ -2604,8 +2604,8 @@
       
 !     Determine the maximum step length.
       
-      stpmx = big
-      if (cnstnd) then
+      stpmx = big ! A big number is assigned to max. step
+      if (cnstnd) then !This is always true
          if (iter .eq. 0) then
             stpmx = one
          else
