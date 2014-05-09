@@ -45,16 +45,16 @@
 !                                                 
 !============================================================================= 
       subroutine setulb(n, m, x, l, u, nbd, f, g, factr, pgtol, wa, iwa, &
-           task, iprint, csave, lsave, isave, dsave, taux, nfg, jmax)
+           task, iprint, csave, lsave, isave, dsave, taux, nfg, jmax, taud, nbisect)
         
       character*60     task, csave
       logical          lsave(4)
       integer          n, m, iprint, nbd(n), iwa(3*n), isave(47), &
-           nfg, jmax
+           nfg, jmax, nbisect
       double precision f, factr, pgtol, x(n), l(n), u(n), g(n), &
 !
 !-jlm-jn
-           wa(2*m*n + 5*n + 11*m*m + 8*m + 2*jmax*n), dsave(30), taux
+           wa(2*m*n + 5*n + 11*m*m + 8*m + 2*jmax*n), dsave(30), taux, taud
  
 !     ************
 !
@@ -279,7 +279,7 @@
            wa(lwn),wa(lsnd),wa(lz),wa(lr),wa(ld),wa(lt),wa(lxp), &
            wa(lwa), iwa(1),iwa(n+1),iwa(2*n+1),task,iprint, &
            csave,lsave,isave(22),dsave,wa(lg), wa(lx), taux, nfg, &
-           jmax)
+           jmax, taud, nbisect)
       
       return
 
@@ -290,17 +290,17 @@
       subroutine mainlb(n, m, x, l, u, nbd, f, g, factr, pgtol, ws, wy, &
            sy, ss, wt, wn, snd, z, r, d, t, xp, wa, &
            index, iwhere, indx2, task, &
-           iprint, csave, lsave, isave, dsave, matG, matX, taux, nfg, jmax)
+           iprint, csave, lsave, isave, dsave, matG, matX, taux, nfg, jmax, taud, nbisect)
         implicit none
         character*60     task, csave
         logical          lsave(4)
         integer          n, m, iprint, nbd(n), index(n),iwhere(n), &
-             indx2(n), isave(26), nfg, jmax
+             indx2(n), isave(26), nfg, jmax, nbisect
         double precision f, factr, pgtol, &
              x(n), l(n), u(n), g(n), z(n), r(n), d(n), t(n), &
              xp(n), wa(8*m), ws(n, m), wy(n, m), sy(m, m), ss(m, m), &
              wt(m, m), wn(2*m, 2*m), snd(2*m, 2*m), dsave(30), matG(n, jmax), &
-             matX(n, jmax), taux
+             matX(n, jmax), taux, taud
         
 !     ************
 !
@@ -646,6 +646,7 @@
 !     Compute f0 and g0.
 
       task = 'FG_START' 
+      nbisect = 0
 !          return to the driver to calculate f and g; reenter at 111.
       goto 1000
  111  continue
@@ -796,8 +797,10 @@
  666  continue
       call lnsrlb(n,l,u,nbd,x,f,fold,gd,gdold,g,d,r,t,z,stp,dnorm, &
            dtd,xstep,stpmx,iter,ifun,iback,nfgv,info,task, &
-           boxed,cnstnd,csave,isave(22),dsave(17))
-      
+           boxed,cnstnd,csave,isave(22),dsave(17), nbisect)
+      if(task .eq. 'MAXIMUM_LIMIT_OF_LINE_SEARCH_BISECTIONS') then
+         goto 999
+      endif
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      
       ncols = min(nfg, jmax)
       if (ncols * nfree .gt. 0) then
@@ -848,7 +851,7 @@
             end do
             
             mxdi = sqrt(dot_product(distx, distx))
-            if(mxdi < 10d0 .and. normd < 0.01d0) then
+            if(mxdi < 10d0 .and. normd < taud) then
                write(nfreelit,'(I10)') nfree
                
                do i = (nfree + 1), n
@@ -946,7 +949,8 @@
 !      endif 
 
       ddum = max(abs(fold), abs(f), one)
-      if ((fold - f) .le. tol*ddum) then
+      !if ((fold - f) .le. tol*ddum) then
+      if(.false.) then
 !                                        terminate the algorithm.
          task = 'CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH'
 !         write (6, *) task
@@ -2555,11 +2559,11 @@
       subroutine lnsrlb(n, l, u, nbd, x, f, fold, gd, gdold, g, d, r, t, &
                        z, stp, dnorm, dtd, xstep, stpmx, iter, ifun,&
                        iback, nfgv, info, task, boxed, cnstnd, csave, &
-                       isave, dsave)
+                       isave, dsave, nbisect)
 
       character*60     task, csave
       logical          boxed, cnstnd
-      integer          n, iter, ifun, iback, nfgv, info, nbd(n), isave(2)
+      integer          n, iter, ifun, iback, nfgv, info, nbd(n), isave(2), nbisect
       double precision f, fold, gd, gdold, stp, dnorm, dtd, xstep, &
                       stpmx, x(n), l(n), u(n), g(n), d(n), r(n), t(n), &
                       z(n), dsave(13)
@@ -2660,7 +2664,7 @@
       endif
       
 !     call dcsrch(f,gd,stp,ftol,gtol,xtol,zero,stpmx,csave,isave,dsave)
-      call lineww(f,gd,stp,ftol,gtol,xtol,zero,stpmx,csave,isave,dsave)
+      call lineww(f,gd,stp,ftol,gtol,xtol,zero,stpmx,csave,isave,dsave,nbisect)
 
       xstep = stp*dnorm
       if (csave(1:4) .ne. 'CONV' .and. csave(1:4) .ne. 'WARN') then
@@ -4033,11 +4037,12 @@
       
 !====================== The end of dcstep ==============================
 
-      subroutine lineww(f,g,stp,ftol,gtol,xtol,stpmin,stpmax,task,isave,dsave)
+      subroutine lineww(f,g,stp,ftol,gtol,xtol,stpmin,stpmax,task,isave,dsave,nbisect)
       character*(*) task
       integer isave(2)
       double precision f,g,stp,ftol,gtol,xtol,stpmin,stpmax
       double precision dsave(13)
+      integer nbisect
 !     **********
 !     Subroutine lineww
 !
@@ -4283,7 +4288,7 @@
       
       if (ABS(sty - stx) > (1 / (2**30))) then
          call linesearchstep(stx,fx,gx,sty,fy,gy,stp,f,g, &
-              brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol)
+              brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol,nbisect,task)
       endif
 
 !     Obtain another function and derivative.
@@ -4319,10 +4324,13 @@
 !====================== The end of lineww ==============================
 
       subroutine linesearchstep(stx,fx,dx,sty,fy,dy,stp,fp,dp,brackt, &
-           stpmin,stpmax,finit,ginit,ftest,ftol,gtol)
+           stpmin,stpmax,finit,ginit,ftest,ftol,gtol,nbisect,task)
       double precision stx,fx,dx,sty,fy,dy,stp,fp,dp,stpmin,stpmax,finit
       double precision ginit,ftest,ftol,gtol
       logical brackt
+      integer nbisect
+      
+      character*60     task
 
 !     **********
 !
@@ -4440,14 +4448,21 @@
       
       !Bisection and expansion
       if (brackt) then
-         stp = (sty + stx)/two
+         if(nbisect < 30) then
+            stp = (sty + stx)/two
+            nbisect = nbisect + 1
+            !write(*, *) 'bisection value', nbisect
+         else
+            task = 'MAXIMUM_LIMIT_OF_LINE_SEARCH_BISECTIONS'
+            !write(*, *) 'abnormal', nbisect
+         endif
       else
          if (two * stp .le. stpmax) then !Remain within boundaries
             ! Still in expansion mode
             stp = two * stp
          else
             brackt = .true.
-            sty = stp
+            stp = stpmax
             fy = fp
             dy = dp
          endif

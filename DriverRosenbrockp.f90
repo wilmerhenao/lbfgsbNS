@@ -71,13 +71,13 @@ program driver
   character(len=120)      :: task, csave
   logical                :: lsave(4)
   integer                :: isave(47), xindex
-  real(dp)               :: f, r
+  real(dp)               :: f, r, taud
   real(dp)               :: dsave(30)
   integer,  allocatable  :: nbd(:), iwa(:)
   real(dp), allocatable  :: x(:), l(:), u(:), g(:), wa(:)
   !
   real(dp)               :: t1, t2, time1, time2, p, z, r1
-  integer                :: i, j, m, n, nfg, startx, startg
+  integer                :: i, j, m, n, nfg, startx, startg, nbisect = 0
   
   ! Get outside parameters
   CHARACTER(len=32) :: arg
@@ -89,6 +89,9 @@ program driver
 
   call getarg(3, arg)
   read(arg,*) p
+
+  call getarg(4, arg)
+  read(arg,*) taud
 
 
   allocate ( nbd(n), x(n), l(n), u(n), g(n) )
@@ -136,9 +139,9 @@ x(1) = x(1) - 1d0
            x(i)=x(i) - (1-2d0**(1-i))
 14         continue 
 
-           do 1454 i=1, n
-              x(i)=3.0d0
-1454            continue
+!           do 1454 i=1, n
+!              x(i)=3.0d0
+!1454            continue
 
 !        x(1) = 0.5d0
 !x(2) = 0.6d0
@@ -165,7 +168,8 @@ x(1) = x(1) - 1d0
         !     This is the call to the L-BFGS-B code.
 
         call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa, &
-             task,iprint, csave,lsave,isave,dsave,taux, nfg, jmax)
+             task,iprint, csave,lsave,isave,dsave,taux, nfg, jmax, taud, nbisect)
+        !write(*,*) 'number of bisections: ', nbisect 
         !write (*,*) 'partial results iteration, f:', isave(30), f
         if (task(1:2) .eq. 'FG') then
 
@@ -303,16 +307,16 @@ x(1) = x(1) - 1d0
      
      !     If task is neither FG nor NEW_X we terminate execution.
      call timer(time2)
-     write (*,*) 'final results rosenbrock (new) run:', m, n, p, isave(30), isave(34), f, dsave(30), dsave(13), time2-time1, task
+     write (*,*) 'final results rosenbrock (new) run:', m, n, p, isave(30), isave(34), f, dsave(30), task
      
-     write (6,*) task  
+     !write (6,*) task  
      !write (6,*) 'Final X='
      !write (6,'((1x,1p, 6(1x,d11.4)))') (x(i),i = 1,n)
      !write (6,*) 'Final G='
      !write (6,'((1x,1p, 6(1x,d11.4)))') (g(i),i = 1,n)
-     write (*,*) 'mnp = ', m, n, p
-     write (*,*) 'Value of f = (NEW CODE)', f
-     write (*,*) 'Iterate ', isave(30)
+     !write (*,*) 'mnp = ', m, n, p
+     !write (*,*) 'Value of f = (NEW CODE)', f
+     !write (*,*) 'Iterate ', isave(30)
      !write (6,*) 'Final X='
      !write (6,'((1x,1p, 6(1x,d11.4)))') (x(i),i = 1,n)
    end program driver
