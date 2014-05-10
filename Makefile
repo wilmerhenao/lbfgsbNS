@@ -24,7 +24,7 @@ DRIVER19_90 = gen_maxqPrinting.f90
 DRIVER20_90 = mifflin2Printing.f90
 
 LBFGS = lbfgsb.f
-LBFGSB  = lbfgsbnomessages.f90
+LBFGSB  = lbfgsbNS.f90
 LBFGSBSTRONG = lbfgsbnomessagesStrong.f90
 LINPACK = linpack.f
 BLAS    = blas.f
@@ -33,7 +33,7 @@ LAPACKFLAG = -llapack
 BLASFLAG = -lblas
 
 #all :  lbfgsb_90_1 lbfgsb_90_2 lbfgsb_90_3 lbfgsb_90_4 lbfgsb_90_5 lbfgsb_90_6 lbfgsb_90_7 lbfgsb_90_8 lbfgsb_90_9 lbfgsb_90_10 lbfgsb_90_11 lbfgsb_90_12 lbfgsb_90_13 lbfgsb_90_14 lbfgsb_90_15 lbfgsb_90_16
-all : lbfgsb_90_16 lbfgsb_90_17 lbfgsb_90_18 lbfgsb_90_19 lbfgsb_90_20
+all : lbfgsb_90_16
 
 lbfgsb_90_1 : $(DRIVER1_90) $(LBFGSB) $(LINPACK) $(BLAS) $(TIMER)
 	$(FC) $(FFLAGS) $(DRIVER1_90) $(LBFGSB) $(LINPACK) $(BLAS) $(TIMER) $(LAPACKFLAG) $(BLASFLAG) -o rosenbrocknonsmooth
