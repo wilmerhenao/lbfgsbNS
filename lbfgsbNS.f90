@@ -887,7 +887,7 @@
       
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      if (info .ne. 0 .or. iback .ge. 50000) then
+      if (info .ne. 0 .or. iback .ge. 20) then
 !          restore the previous iterate.
          call dcopy(n,t,1,x,1)
          call dcopy(n,r,1,g,1)
@@ -4267,6 +4267,8 @@
            task = 'WARNING: XTOL TEST SATISFIED'
       if (stp .gt. 2**20) & 
            task = 'WARNING: STP = TOO LONG'
+      if (stp .eq. stpmax .and. f .le. ftest .and. g .le. gtest)  &
+           task = 'WARNING: STP = STPMAX'
 
 !      if (stp .eq. stpmin .and. (f .gt. ftest .or. g .ge. gtest)) &
 !           task = 'WARNING: STP = STPMIN'
@@ -4283,8 +4285,6 @@
       if (task(1:4) .eq. 'WARN' .or. task(1:4) .eq. 'CONV') goto 1000
       
 !     Run the procedure This part is similar to dcstep
-!      write (*,*) 'g: '
-!      write (*,*) g
       
       if (ABS(sty - stx) > (1 / (2**30))) then
          call linesearchstep(stx,fx,gx,sty,fy,gy,stp,f,g, &
@@ -4442,6 +4442,7 @@
             fx = fp
             dx = dp
          else
+            write(*,*) 'Function should never enter here!!!'
             return
          endif
       endif   
@@ -4451,10 +4452,8 @@
          if(nbisect < 30) then
             stp = (sty + stx)/two
             nbisect = nbisect + 1
-            !write(*, *) 'bisection value', nbisect
          else
             task = 'MAXIMUM_LIMIT_OF_LINE_SEARCH_BISECTIONS'
-            !write(*, *) 'abnormal', nbisect
          endif
       else
          if (two * stp .le. stpmax) then !Remain within boundaries
@@ -4463,6 +4462,7 @@
          else
             brackt = .true.
             stp = stpmax
+            sty = stpmax
             fy = fp
             dy = dp
          endif
