@@ -833,6 +833,7 @@
             allocate(freex(indclose))
             freex = 1/indclose
             call  qpspecial(nfree, indclose, matGfreefit, 100, freex, normd)
+            dsave(30) = normd
             !write(*,*) normd
             do i = 1, n
                newx(i) = x(i)
