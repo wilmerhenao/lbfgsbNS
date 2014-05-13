@@ -137,9 +137,9 @@ x(1) = x(1) - 1d0
            x(i)=x(i) - (1-2d0**(1-i))
 14         continue 
 
-           do 1454 i=1, n
-              x(i)=3.0d0
-1454            continue
+!           do 1454 i=1, n
+!              x(i)=3.0d0
+!1454            continue
 
 !        x(1) = 0.5d0
 !x(2) = 0.6d0
@@ -316,14 +316,14 @@ x(1) = x(1) - 1d0
      call timer(time2)
      write (*,*) 'final results rosenbrock (new) run:', m, n, p, isave(30), isave(34), f, dsave(30), dsave(13), time2-time1, task
      
-     write (6,*) task  
+     !write (6,*) task  
      !write (6,*) 'Final X='
      !write (6,'((1x,1p, 6(1x,d11.4)))') (x(i),i = 1,n)
      !write (6,*) 'Final G='
      !write (6,'((1x,1p, 6(1x,d11.4)))') (g(i),i = 1,n)
-     write (*,*) 'mnp = ', m, n, p
-     write (*,*) 'Value of f = (NEW CODE)', f
-     write (*,*) 'Iterate ', isave(30)
+     !write (*,*) 'mnp = ', m, n, p
+     !write (*,*) 'Value of f = (NEW CODE)', f
+     !write (*,*) 'Iterate ', isave(30)
      !write (6,*) 'Final X='
      !write (6,'((1x,1p, 6(1x,d11.4)))') (x(i),i = 1,n)
    end program driver

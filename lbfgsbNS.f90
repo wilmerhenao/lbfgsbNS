@@ -833,6 +833,7 @@
             allocate(freex(indclose))
             freex = 1/indclose
             call  qpspecial(nfree, indclose, matGfreefit, 100, freex, normd)
+            !write(*,*) normd
             do i = 1, n
                newx(i) = x(i)
             end do
@@ -887,7 +888,7 @@
       
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      if (info .ne. 0 .or. iback .ge. 20) then
+      if (info .ne. 0 .or. iback .ge. 100) then
 !          restore the previous iterate.
          call dcopy(n,t,1,x,1)
          call dcopy(n,r,1,g,1)
@@ -1411,7 +1412,7 @@
 !       GCP on exit.
 !
 !     m is an integer variable.
-!       On entry m is the maximum number of variable metric corrections 
+!       On entry m is the maximum number of varsiable metric corrections 
 !         used to define the limited memory matrix.
 !       On exit m is unchanged.
 !
@@ -2655,9 +2656,9 @@
          if (gd .ge. zero) then
 !                               the directional derivative >=0.
 !                               Line search is impossible.
-            write(6,*)' ascent direction in projection gd = ', gd
-            write (6,*) 'Final X='
-            write (6,'((1x,1p, 6(1x,d11.4)))') (x(i),i = 1,n)
+            !write(6,*)' ascent direction in projection gd = ', gd
+            !write (6,*) 'Final X='
+            !write (6,'((1x,1p, 6(1x,d11.4)))') (x(i),i = 1,n)
             info = -4
             return
          endif
@@ -3372,8 +3373,8 @@
  55   continue
       if ( dd_p .gt.zero ) then
          call dcopy( n, xp, 1, x, 1 )
-         write(6,*) ' Positive dir derivative in projection '
-         write(6,*) ' Using the backtracking step '
+         !write(6,*) ' Positive dir derivative in projection '
+         !write(6,*) ' Using the backtracking step '
       else
          go to 911
       endif
@@ -4183,6 +4184,7 @@
       integer stage
       double precision finit,ftest,fm,fx,fxm,fy,fym,ginit,gtest, &
             gm,gx,gxm,gy,gym,stx,sty,stmin,stmax,width,width1
+      integer myiter = -1
 
 !     Initialization block.
 
@@ -4286,11 +4288,31 @@
       
 !     Run the procedure This part is similar to dcstep
       
-      if (ABS(sty - stx) > (1 / (2**30))) then
+      if (ABS(sty - stx) > (1 / (2**30)) .and. myiter .ge. 0) then
          call linesearchstep(stx,fx,gx,sty,fy,gy,stp,f,g, &
               brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol,nbisect,task)
       endif
 
+      if (ABS(sty - stx) > (1 / (2**30)) .and. myiter < 0) then
+         call linesearchstepb(stx,fx,gx,sty,fy,gy,stp,f,g, &
+              brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol)
+      endif
+
+!     Set the minimum and maximum steps allowed for stp.
+! this is the part that I changed
+      if (brackt) then
+         stmin = min(stx,sty)
+         stmax = max(stx,sty)
+      else
+         stmin = stp + xtrapl*(stp - stx)
+         stmax = stp + xtrapu*(stp - stx)
+      endif
+ 
+!     Force the step to be within the bounds stpmax and stpmin.
+ 
+      stp = max(stp,stpmin)
+      stp = min(stp,stpmax)
+! Here ends the last part that I changed
 !     Obtain another function and derivative.
 
       task = 'FG'
@@ -4771,3 +4793,136 @@ subroutine checkifxbelongs(n, m, x, matX, j, closee, taux)
 end subroutine checkifxbelongs
 
 ! ----------------------- end of checkifxbelongs ---------------------------
+
+      subroutine linesearchstepb(stx,fx,dx,sty,fy,dy,stp,fp,dp,brackt, &
+           stpmin,stpmax,finit,ginit,ftest,ftol,gtol)
+      logical brackt
+      double precision stx,fx,dx,sty,fy,dy,stp,fp,dp,stpmin,stpmax,finit
+      double precision ginit,ftest,ftol,gtol
+
+!     **********
+!
+!     Subroutine dcstep
+!
+!     This subroutine computes a safeguarded step for a search
+!     procedure and updates an interval that contains a step that
+!     satisfies a sufficient decrease and a curvature condition.
+!
+!     The parameter stx contains the step with the least function
+!     value. If brackt is set to .true. then a minimizer has
+!     been bracketed in an interval with endpoints stx and sty.
+!     The parameter stp contains the current step. 
+!     The subroutine assumes that if brackt is set to .true. then
+!
+!           min(stx,sty) < stp < max(stx,sty),
+!
+!     and that the derivative at stx is negative in the direction 
+!     of the step.
+!
+!     The subroutine statement is
+!
+!       subroutine dcstep(stx,fx,dx,sty,fy,dy,stp,fp,dp,brackt,
+!                         stpmin,stpmax)
+!
+!     where
+!
+!       stx is a double precision variable.
+!         On entry stx is the best step obtained so far and is an
+!            endpoint of the interval that contains the minimizer. 
+!         On exit stx is the updated best step.
+!
+!       fx is a double precision variable.
+!         On entry fx is the function at stx.
+!         On exit fx is the function at stx.
+!
+!       dx is a double precision variable.
+!         On entry dx is the derivative of the function at 
+!            stx. The derivative must be negative in the direction of 
+!            the step, that is, dx and stp - stx must have opposite 
+!            signs.
+!         On exit dx is the derivative of the function at stx.
+!
+!       sty is a double precision variable.
+!         On entry sty is the second endpoint of the interval that 
+!            contains the minimizer.
+!         On exit sty is the updated endpoint of the interval that 
+!            contains the minimizer.
+!
+!       fy is a double precision variable.
+!         On entry fy is the function at sty.
+!         On exit fy is the function at sty.
+!
+!       dy is a double precision variable.
+!         On entry dy is the derivative of the function at sty.
+!         On exit dy is the derivative of the function at the exit sty.
+!
+!       stp is a double precision variable.
+!         On entry stp is the current step. If brackt is set to .true.
+!            then on input stp must be between stx and sty. 
+!         On exit stp is a new trial step.
+!
+!       fp is a double precision variable.
+!         On entry fp is the function at stp
+!         On exit fp is unchanged.
+!
+!       dp is a double precision variable.
+!         On entry dp is the the derivative of the function at stp.
+!         On exit dp is unchanged.
+!
+!       brackt is an logical variable.
+!         On entry brackt specifies if a minimizer has been bracketed.
+!            Initially brackt must be set to .false.
+!         On exit brackt specifies if a minimizer has been bracketed.
+!            When a minimizer is bracketed brackt is set to .true.
+!
+!       stpmin is a double precision variable.
+!         On entry stpmin is a lower bound for the step.
+!         On exit stpmin is unchanged.
+!
+!       stpmax is a double precision variable.
+!         On entry stpmax is an upper bound for the step.
+!         On exit stpmax is unchanged.
+!
+!     MINPACK-1 Project. June 1983
+!     Argonne National Laboratory. 
+!     Jorge J. More' and David J. Thuente.
+!
+!     MINPACK-2 Project. October 1993.
+!     Argonne National Laboratory and University of Minnesota. 
+!     Brett M. Averick and Jorge J. More'.
+!
+!     **********
+      double precision zero,p66,two,three
+      parameter(zero=0.0d0,p66=0.66d0,two=2.0d0,three=3.0d0)
+      
+      double precision gamma,p,q,r,s,stpc,stpf
+!      write(*,*) 'dp:'
+!      write(*,*) dp
+!     Check first condition if first condition is violated.  Gone too far
+      if (fp .ge. ftest) then 
+         sty = stp
+         fy = fp
+         dy = dp
+      else
+!     if second condition is violated not gone far enough
+         if (-dp .ge. gtol*(-ginit)) then
+            stx = stp
+            fx = fp
+            dx = dp
+         else
+            !print *, 'You shouldnt ever have to enter here'
+!            task = 'ERROR:  USER SHOULDNT ENTER IN THIS ELSE STATEMENT'
+         endif         
+      endif   
+      stpf = (sty + stx)/two
+      if ((min(stx,sty) .le. stp) .and. stp .le. max(stx,sty)) then
+         brackt = .true.
+      endif
+      
+!     Compute the new step.
+      
+      stp = stpf
+      return
+      end
+      
+!====================== The end of linesearchstep ==============================

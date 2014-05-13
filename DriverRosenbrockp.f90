@@ -63,7 +63,7 @@ program driver
   !     We specify the dimension n of the sample problem and the number
   !        m of limited memory corrections stored. 
   
-  integer,  parameter    :: iprint = -10, numargs = 0, jmax = 10d0
+  integer,  parameter    :: iprint = -10, numargs = 0, jmax = 20d0
   integer,  parameter    :: dp = kind(1.0d0)
   real(dp), parameter    :: factr  = 0.0d0, pgtol  = 0.0d0, &
        tlimit = 1000.0d0, taux = 1.0d-3
@@ -139,6 +139,7 @@ x(1) = x(1) - 1d0
            x(i)=x(i) - (1-2d0**(1-i))
 14         continue 
 
+x = 3d0
 !           do 1454 i=1, n
 !              x(i)=3.0d0
 !1454            continue
