@@ -3518,7 +3518,7 @@
 !         On entry ftol specifies a nonnegative tolerance for the 
 !            sufficient decrease condition.
 !         On exit ftol is unchanged.
-!
+!myiter
 !       gtol is a double precision variable.
 !         On entry gtol specifies a nonnegative tolerance for the 
 !            curvature condition. 
@@ -4184,7 +4184,7 @@
       integer stage
       double precision finit,ftest,fm,fx,fxm,fy,fym,ginit,gtest, &
             gm,gx,gxm,gy,gym,stx,sty,stmin,stmax,width,width1
-      integer myiter = -1
+      integer, parameter :: myiter=1
 
 !     Initialization block.
 
@@ -4208,7 +4208,7 @@
 
 !        Initialize local variables.
 
-         brackt = .false.
+         brackt = .true.
          stage  = 1
          finit  = f
          ginit  = g
@@ -4288,14 +4288,14 @@
       
 !     Run the procedure This part is similar to dcstep
       
-      if (ABS(sty - stx) > (1 / (2**30)) .and. myiter .ge. 0) then
+      if (ABS(sty - stx) > (1 / (2**30)) .and. myiter < 0) then
          call linesearchstep(stx,fx,gx,sty,fy,gy,stp,f,g, &
               brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol,nbisect,task)
       endif
 
-      if (ABS(sty - stx) > (1 / (2**30)) .and. myiter < 0) then
+      if (ABS(sty - stx) > (1 / (2**30)) .and. myiter > 0) then
          call linesearchstepb(stx,fx,gx,sty,fy,gy,stp,f,g, &
-              brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol)
+              brackt,stmin,stmax,finit,ginit,ftest,ftol,gtol, nbisect)
       endif
 
 !     Set the minimum and maximum steps allowed for stp.
@@ -4795,11 +4795,11 @@ end subroutine checkifxbelongs
 ! ----------------------- end of checkifxbelongs ---------------------------
 
       subroutine linesearchstepb(stx,fx,dx,sty,fy,dy,stp,fp,dp,brackt, &
-           stpmin,stpmax,finit,ginit,ftest,ftol,gtol)
+           stpmin,stpmax,finit,ginit,ftest,ftol,gtol, nbisect)
       logical brackt
       double precision stx,fx,dx,sty,fy,dy,stp,fp,dp,stpmin,stpmax,finit
       double precision ginit,ftest,ftol,gtol
-
+      integer nbisect
 !     **********
 !
 !     Subroutine dcstep
@@ -4903,6 +4903,7 @@ end subroutine checkifxbelongs
          sty = stp
          fy = fp
          dy = dp
+         brackt = .true.
       else
 !     if second condition is violated not gone far enough
          if (-dp .ge. gtol*(-ginit)) then
@@ -4913,8 +4914,29 @@ end subroutine checkifxbelongs
             !print *, 'You shouldnt ever have to enter here'
 !            task = 'ERROR:  USER SHOULDNT ENTER IN THIS ELSE STATEMENT'
          endif         
-      endif   
-      stpf = (sty + stx)/two
+      endif  
+      
+     !Bisection and expansion
+      if (brackt) then
+         if(nbisect < 500) then
+            stpf = (sty + stx)/two
+            nbisect = nbisect + 1
+         else
+            !task = 'MAXIMUM_LIMIT_OF_LINE_SEARCH_BISECTIONS'
+         endif
+      else
+         if (two * stp .le. stpmax) then !Remain within boundaries
+            ! Still in expansion mode
+            stp = two * stp
+         else
+            brackt = .true.
+            stpf = stpmax
+            sty = stpmax
+            fy = fp
+            dy = dp
+         endif
+      endif
+      
       if ((min(stx,sty) .le. stp) .and. stp .le. max(stx,sty)) then
          brackt = .true.
       endif
