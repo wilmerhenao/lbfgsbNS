@@ -170,6 +170,8 @@ x = 3d0
 
         call setulb(n,m,x,l,u,nbd,f,g,factr,pgtol,wa,iwa, &
              task,iprint, csave,lsave,isave,dsave,taux, nfg, jmax, taud, nbisect)
+        !write (*,*) 'final results rosenbrock (new) run:', m, n, p, isave(30), isave(34), f, dsave(30), task
+     
         !write(*,*) 'number of bisections: ', nbisect 
         !write (*,*) 'partial results iteration, f:', isave(30), f
         if (task(1:2) .eq. 'FG') then

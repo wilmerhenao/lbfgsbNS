@@ -4919,7 +4919,7 @@ end subroutine checkifxbelongs
       
      !Bisection and expansion
       if (brackt) then
-         if(nbisect < 500) then
+         if(nbisect < 30) then
             stpf = (sty + stx)/two
             nbisect = nbisect + 1
          else
